@@ -41,5 +41,5 @@ Product.create(:title => 'Rails Test Prescriptions',
         procedures for Rails 2 and Rails 3, and introduces popular add-ons,
         including Cucumber, Shoulda, Machinist, Mocha, and Rcov.
       </p>},
-               :image_url => '/images/rtp.jpg',
+               :image_url => '/public/images/rtp.jpg',
                :price => 43.75)
