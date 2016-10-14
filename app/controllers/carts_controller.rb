@@ -1,8 +1,8 @@
 class CartsController < ApplicationController
-  before_action :set_cart, only: [:show, :edit, :update, :destroy]
+  before_action :set_cart, only: [:edit, :update,]
 
   # GET /carts
-  # GET /carts.json
+  #  GET /carts.json
   def index
     @carts = Cart.all
   end
@@ -10,6 +10,17 @@ class CartsController < ApplicationController
   # GET /carts/1
   # GET /carts/1.json
   def show
+    begin
+      @cart = Cart.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      logger.error "Attempt to access invalid cart #{params[:id]}"
+      redirect_to store_index_path, :notice => "Invalid cart"
+    else
+      respond_to do |format|
+        format.html #show.html.erb
+        format.xml { render :xml => @cart }
+      end
+    end
   end
 
   # GET /carts/new
@@ -23,19 +34,19 @@ class CartsController < ApplicationController
 
   # POST /carts
   # POST /carts.json
-  def create
-    @cart = Cart.new(cart_params)
-
-    respond_to do |format|
-      if @cart.save
-        format.html { redirect_to @cart, notice: 'Cart was successfully created.' }
-        format.json { render :show, status: :created, location: @cart }
-      else
-        format.html { render :new }
-        format.json { render json: @cart.errors, status: :unprocessable_entity }
-      end
-    end
-  end
+  #   def create
+  #     @cart = Cart.new(cart_params)
+  #
+  #     respond_to do |format|
+  #       if @cart.save
+  #         format.html { redirect_to @cart, notice: 'Cart was successfully created.' }
+  #         format.json { render :show, status: :created, location: @cart }
+  #       else
+  #         format.html { render :new }
+  #         format.json { render json: @cart.errors, status: :unprocessable_entity }
+  #       end
+  #     end
+  #   end
 
   # PATCH/PUT /carts/1
   # PATCH/PUT /carts/1.json
@@ -54,8 +65,11 @@ class CartsController < ApplicationController
   # DELETE /carts/1
   # DELETE /carts/1.json
   def destroy
+    @cart = current_cart
     @cart.destroy
+    session[:cart_id] = nil
     respond_to do |format|
+      format.html {redirect_to(store_index_url, :notice => 'Your cart is currently empty')}
       format.html { redirect_to carts_url, notice: 'Cart was successfully destroyed.' }
       format.json { head :no_content }
     end
